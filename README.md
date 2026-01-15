@@ -1,6 +1,6 @@
 # GitLingo
 
-View your GitHub programming language statistics straight in your terminal.
+Checkout your GitHub programming language statistics straight in your terminal.
 
 > **⚠️ Alpha Version**: This is a very first version and the code needs heavy refactoring. Known areas for improvement:
 

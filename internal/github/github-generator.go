@@ -34,6 +34,7 @@ type Language struct {
 type GithubStats struct {
 	Username      string
 	LanguageStats []Language
+	TotalBytes    int
 }
 
 var httpClient = &http.Client{
@@ -42,6 +43,7 @@ var httpClient = &http.Client{
 
 func ProcessGithubData(ctx context.Context) (*GithubStats, error) {
 	languageAggregations := map[string]int{}
+	totalBytes := 0
 
 	repos, err := fetchGithubData(ctx)
 	if err != nil {
@@ -50,6 +52,7 @@ func ProcessGithubData(ctx context.Context) (*GithubStats, error) {
 	for _, repo := range repos {
 		for _, lang := range repo.Languages {
 			languageAggregations[lang.Name] += lang.Bytes
+			totalBytes += lang.Bytes
 		}
 	}
 
@@ -64,6 +67,7 @@ func ProcessGithubData(ctx context.Context) (*GithubStats, error) {
 	return &GithubStats{
 		LanguageStats: languageStats,
 		Username:      repos[0].Owner.Login,
+		TotalBytes:    totalBytes,
 	}, nil
 }
 

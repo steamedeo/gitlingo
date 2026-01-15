@@ -43,7 +43,7 @@ func main() {
 			},
 		},
 		Commands: []*cli.Command{
-			cmd.NewGeneratecommand(),
+			cmd.NewLanguageCommand(),
 		},
 	}
 

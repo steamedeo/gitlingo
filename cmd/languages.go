@@ -12,16 +12,23 @@ import (
 	"steamedeo.dev/gitlingo/internal/github"
 )
 
-func NewGeneratecommand() *cli.Command {
+func NewLanguageCommand() *cli.Command {
 	return &cli.Command{
-		Name:   "generate",
-		Usage:  "show your programming languages statistics",
-		Flags:  []cli.Flag{},
-		Action: generate,
+		Name:  "languages",
+		Usage: "show your top programming languages statistics",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:     "all",
+				Usage:    "show all languages instead of top 10",
+				Required: false,
+			},
+		},
+		Action: showLanguages,
 	}
 }
 
-func generate(ctx context.Context, cmd *cli.Command) error {
+func showLanguages(ctx context.Context, cmd *cli.Command) error {
+	showAll := cmd.Bool("all")
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 	s.Suffix = " Fetching GitHub data..."
 	s.Color("magenta", "bold")
@@ -33,11 +40,11 @@ func generate(ctx context.Context, cmd *cli.Command) error {
 	}
 	s.Stop()
 	fmt.Println() // Add spacing
-	renderStats(stats)
+	renderStats(stats, showAll)
 	return nil
 }
 
-func renderStats(stats *github.GithubStats) {
+func renderStats(stats *github.GithubStats, showAll bool) {
 	// Primary color: bright pink (205)
 	// Secondary color: purple/lavender (141)
 
@@ -91,7 +98,7 @@ func renderStats(stats *github.GithubStats) {
 
 	// Top 10 languages
 	topLanguages := stats.LanguageStats
-	if len(topLanguages) > 10 {
+	if len(topLanguages) > 10 && !showAll {
 		topLanguages = topLanguages[:10]
 	}
 
@@ -111,6 +118,10 @@ func renderStats(stats *github.GithubStats) {
 
 		sizeStr := formatBytes(lang.Bytes)
 
+		// Calculate percentage
+		percentage := float64(lang.Bytes) / float64(stats.TotalBytes) * 100
+		sizeWithPercent := fmt.Sprintf("%s (%.1f%%)", sizeStr, percentage)
+
 		// Use different colors for top 3 vs rest
 		var numberStyle, langStyle, barStyle, sizeStyle lipgloss.Style
 		if i < 3 {
@@ -129,9 +140,18 @@ func renderStats(stats *github.GithubStats) {
 			numberStyle.Render(fmt.Sprintf("%2d.", i+1)),
 			langStyle.Render(fmt.Sprintf("%-15s", lang.Name)),
 			barStyle.Render(bar),
-			sizeStyle.Render(sizeStr))
+			sizeStyle.Render(sizeWithPercent))
 	}
 
+	fmt.Println()
+
+	// Display total
+	totalStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("141"))
+
+	totalBytes := formatBytes(stats.TotalBytes)
+	fmt.Printf("%s %s\n", totalStyle.Render("Total Code Scanned:"), totalStyle.Render(totalBytes))
 	fmt.Println()
 }
 
