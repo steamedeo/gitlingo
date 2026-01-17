@@ -14,10 +14,12 @@ type Config struct {
 var AppConfig *Config
 
 func Load() error {
-	godotenv.Load()
-	githubToken := os.Getenv("github_token")
+	if err := godotenv.Load(); err != nil {
+		return err
+	}
+	githubToken := os.Getenv("GITHUB_TOKEN")
 	if githubToken == "" {
-		return errors.New("Github token not set!")
+		return errors.New("github token not set!")
 	}
 
 	AppConfig = &Config{

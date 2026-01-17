@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"sort"
-	"time"
 
-	"steamedeo.dev/gitlingo/internal/config"
+	"steamedeo.dev/gitlingo/internal/relay"
 )
 
 type Owner struct {
@@ -37,10 +35,6 @@ type GithubStats struct {
 	TotalBytes    int
 }
 
-var httpClient = &http.Client{
-	Timeout: 10 * time.Second,
-}
-
 func ProcessGithubData(ctx context.Context) (*GithubStats, error) {
 	languageAggregations := map[string]int{}
 	totalBytes := 0
@@ -48,6 +42,9 @@ func ProcessGithubData(ctx context.Context) (*GithubStats, error) {
 	repos, err := fetchGithubData(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if len(repos) == 0 {
+		return nil, fmt.Errorf("no repositories found for the authenticated user")
 	}
 	for _, repo := range repos {
 		for _, lang := range repo.Languages {
@@ -94,13 +91,16 @@ func fetchGithubData(ctx context.Context) ([]Repository, error) {
 func fetchRepositories(ctx context.Context, page int) ([]Repository, error) {
 	var repositories []Repository
 	url := fmt.Sprintf("https://api.github.com/user/repos?affiliation=owner&per_page=100&page=%d", page)
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	relay, err := relay.NewRelay(relay.RelayOptions{
+		Context:        ctx,
+		URL:            url,
+		Method:         "GET",
+		RequestPayload: nil,
+	})
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "Bearer "+config.AppConfig.GithubToken)
-	req.Header.Add("User-Agent", "gitlingo")
-	res, err := httpClient.Do(req)
+	res, err := relay.SendHTTPRequest()
 	if err != nil {
 		return nil, err
 	}
@@ -118,18 +118,22 @@ func fetchRepositories(ctx context.Context, page int) ([]Repository, error) {
 func fetchRepoLanguages(ctx context.Context, r []Repository) error {
 	for i := range r {
 		url := fmt.Sprintf("https://api.github.com/repos/%s/%s/languages", r[i].Owner.Login, r[i].Name)
-		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+		relay, err := relay.NewRelay(relay.RelayOptions{
+			Context:        ctx,
+			URL:            url,
+			Method:         "GET",
+			RequestPayload: nil,
+		})
 		if err != nil {
 			return err
 		}
-		req.Header.Add("Authorization", "Bearer "+config.AppConfig.GithubToken)
-		req.Header.Add("User-Agent", "gitlingo")
-		res, err := httpClient.Do(req)
+		res, err := relay.SendHTTPRequest()
 		if err != nil {
 			return err
 		}
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
+			res.Body.Close()
 			return err
 		}
 		res.Body.Close()

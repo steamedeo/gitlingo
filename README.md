@@ -2,14 +2,6 @@
 
 Checkout your GitHub programming language statistics straight in your terminal.
 
-> **⚠️ Alpha Version**: This is a very first version and the code needs heavy refactoring. Known areas for improvement:
-
-> - Concurrency improvements with goroutines
-> - Rate limit handling
-> - Retry logic for transient network issues
-> - HTTP status code checking
-> - Centralized HTTP logic
-
 ## Installation
 
 ```bash
@@ -21,7 +13,6 @@ make build
 ## Setup
 
 1. Create a GitHub Personal Access Token:
-
    - Go to [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
    - Click "Generate new token (classic)"
    - Give it a name (e.g., "GitLingo")
@@ -43,7 +34,7 @@ make build
 ## Usage
 
 ```bash
-./bin/gitlingo generate
+./bin/gitlingo languages
 ```
 
 This will display your top 10 programming languages by total bytes across all your repositories.
