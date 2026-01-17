@@ -39,6 +39,8 @@ make build
 
 This will display your top 10 programming languages by total bytes across all your repositories.
 
+![GitLingo Language Stats](img/sample.png)
+
 ## How it works
 
 GitLingo fetches all your GitHub repositories and aggregates language statistics to show you what you code in most.
