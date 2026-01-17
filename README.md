@@ -1,11 +1,19 @@
 # GitLingo
 
+[![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)](https://golang.org)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/steamedeo/gitlingo)](https://goreportcard.com/report/github.com/steamedeo/gitlingo)
+
+![GitLingo Language Stats](img/sample.png)
+
 Checkout your GitHub programming language statistics straight in your terminal.
 
 ## Installation
 
+### From Source
+
 ```bash
-git clone https://github.com/yourusername/gitlingo.git
+git clone https://github.com/steamedeo/gitlingo.git
 cd gitlingo
 make build
 ```
@@ -45,8 +53,10 @@ To see all languages instead of just the top 15:
 ./bin/gitlingo languages --all
 ```
 
-![GitLingo Language Stats](img/sample.png)
-
 ## How it works
 
 GitLingo fetches all your GitHub repositories and aggregates language statistics to show you what you code in most.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
