@@ -287,7 +287,7 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 	const gridHeight = 10
 
 	// Calculate how many dots each language gets
-	dots := make([]int, len(languages)+1) // +1 for "Others"
+	dots := make([]int, len(languages)+1)
 	remainingDots := totalDots
 
 	for i, lang := range languages {
@@ -297,7 +297,7 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 		percentage := float64(lang.Bytes) / float64(totalBytes)
 		dots[i] = int(percentage * float64(totalDots))
 		if dots[i] == 0 && percentage > 0 {
-			dots[i] = 1 // Ensure at least 1 dot if there's any data
+			dots[i] = 1
 		}
 		remainingDots -= dots[i]
 	}
@@ -307,7 +307,7 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 		percentage := float64(othersBytes) / float64(totalBytes)
 		dots[len(languages)] = int(percentage * float64(totalDots))
 		if dots[len(languages)] == 0 && percentage > 0 {
-			dots[len(languages)] = 1 // Ensure at least 1 dot if there's any data
+			dots[len(languages)] = 1
 		}
 		remainingDots -= dots[len(languages)]
 	}
@@ -316,7 +316,6 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 	if len(dots) > 0 && remainingDots > 0 {
 		dots[0] += remainingDots
 	} else if remainingDots < 0 {
-		// If we went over, take from the largest
 		dots[0] += remainingDots
 	}
 
@@ -325,9 +324,8 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 	dotIndex := 0
 	for i, count := range dots {
 		for j := 0; j < count && dotIndex < totalDots; j++ {
-			// Use gray color (240) for "Others" category
 			if i == len(languages) {
-				dotColors[dotIndex] = -1 // Special marker for "Others"
+				dotColors[dotIndex] = -1
 			} else {
 				dotColors[dotIndex] = i
 			}
@@ -343,7 +341,6 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 			idx := row*gridWidth + col
 			if idx < len(dotColors) {
 				if dotColors[idx] == -1 {
-					// "Others" category in gray
 					colorStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 					line.WriteString(colorStyle.Render("●"))
 				} else if dotColors[idx] < len(colors) {
@@ -355,7 +352,6 @@ func buildASCIIPie(languages []github.Language, othersBytes int, totalBytes int,
 			} else {
 				line.WriteString(" ")
 			}
-			// Add spacing between dots
 			if col < gridWidth-1 {
 				line.WriteString(" ")
 			}
