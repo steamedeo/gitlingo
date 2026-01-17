@@ -39,6 +39,12 @@ make build
 
 This will display your top 10 programming languages by total bytes across all your repositories.
 
+To see all languages instead of just the top 10:
+
+```bash
+./bin/gitlingo languages --all
+```
+
 ![GitLingo Language Stats](img/sample.png)
 
 ## How it works
