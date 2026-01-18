@@ -14,12 +14,18 @@ type Config struct {
 var AppConfig *Config
 
 func Load() error {
-	if err := godotenv.Load(); err != nil {
-		return err
-	}
+	// Try to load from environment variable first
 	githubToken := os.Getenv("GITHUB_TOKEN")
+
+	// If not found in environment, try loading from .env file
 	if githubToken == "" {
-		return errors.New("github token not set!")
+		// Ignore error if .env file doesn't exist - environment variable takes precedence
+		_ = godotenv.Load()
+		githubToken = os.Getenv("GITHUB_TOKEN")
+	}
+
+	if githubToken == "" {
+		return errors.New("github token not set! Set GITHUB_TOKEN environment variable or create a .env file with github_token=your_token")
 	}
 
 	AppConfig = &Config{

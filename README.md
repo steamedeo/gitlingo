@@ -10,60 +10,108 @@ Checkout your GitHub programming language statistics straight in your terminal.
 
 ## Installation
 
-### From Source
+### Prerequisites
+
+- Go 1.25 or higher ([Download here](https://golang.org/dl/))
+
+### Option 1: Local Build (Recommended for beginners)
 
 ```bash
+# Clone the repository
 git clone https://github.com/steamedeo/gitlingo.git
 cd gitlingo
+
+# Build the binary (this creates the bin folder)
 make build
 ```
 
-## Setup
+**Setup:** Create a `.env` file in the gitlingo directory with your GitHub token:
 
-1. Create a GitHub Personal Access Token:
-   - Go to [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
-   - Click "Generate new token (classic)"
-   - Give it a name (e.g., "GitLingo")
-   - Select the `repo` scope
-   - Click "Generate token"
-   - Copy the token (starts with `ghp_`)
+```bash
+cp .env.example .env
+# Edit .env and add: github_token=ghp_yourTokenHere
+```
 
-2. Create a `.env` file:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Add your token to the `.env` file:
-   ```
-   github_token=ghp_yourTokenHere
-   ```
-
-## Usage
+**Usage:** Run from the project directory:
 
 ```bash
 ./bin/gitlingo languages
 ```
 
-This will display your top 15 programming languages by total bytes across all your repositories.
-
-To see all languages instead of just the top 15:
+### Option 2: Global Install (For advanced users)
 
 ```bash
-./bin/gitlingo languages --all
+# Clone and install
+git clone https://github.com/steamedeo/gitlingo.git
+cd gitlingo
+make install
 ```
 
-To exclude specific languages from the results (e.g., markup or configuration languages you're not interested in):
+**Setup:** Set the `GITHUB_TOKEN` environment variable permanently:
+
+**On Linux/macOS:**
+```bash
+# Add to ~/.bashrc, ~/.zshrc, or ~/.profile
+echo 'export GITHUB_TOKEN=ghp_yourTokenHere' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**On Windows (PowerShell):**
+```powershell
+# Set permanently for your user
+[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', 'ghp_yourTokenHere', 'User')
+# Restart your terminal after this
+```
+
+**On Windows (CMD):**
+```cmd
+# Set permanently for your user
+setx GITHUB_TOKEN ghp_yourTokenHere
+# Restart your terminal after this
+```
+
+**Usage:** Run from anywhere:
 
 ```bash
-./bin/gitlingo languages --exclude CSS,HTML,Dart
+gitlingo languages
 ```
 
-You can combine the `--all` and `--exclude` flags:
+---
+
+### Getting your GitHub Token
+
+1. Go to [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
+2. Click "Generate new token (classic)"
+3. Give it a name (e.g., "GitLingo")
+4. Select the `repo` scope
+5. Click "Generate token"
+6. Copy the token (starts with `ghp_`)
+
+## Usage
+
+Display your top 15 programming languages by total bytes across all your repositories.
+
+### Options
+
+**Show all languages** (instead of just top 15):
 
 ```bash
-./bin/gitlingo languages --all --exclude CSS,Python
+gitlingo languages --all
 ```
+
+**Exclude specific languages** (e.g., markup or configuration languages):
+
+```bash
+gitlingo languages --exclude CSS,HTML,Dart
+```
+
+**Combine flags**:
+
+```bash
+gitlingo languages --all --exclude CSS,Python
+```
+
+> **Note:** If you used Option 1 (local build), run commands from the project directory with `./bin/gitlingo` instead of just `gitlingo`
 
 ## How it works
 
