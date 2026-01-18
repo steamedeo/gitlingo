@@ -21,6 +21,7 @@ type Repository struct {
 	CreationTimestamp string `json:"created_at"`
 	PrimaryLanguage   string `json:"language"`
 	Owner             Owner  `json:"owner"`
+	Fork              bool   `json:"fork"`
 	Languages         []Language
 }
 
@@ -109,9 +110,18 @@ func fetchRepositories(ctx context.Context, page int) ([]Repository, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(body, &repositories); err != nil {
+	var allRepos []Repository
+	if err := json.Unmarshal(body, &allRepos); err != nil {
 		return nil, err
 	}
+
+	// Filter out forks
+	for _, repo := range allRepos {
+		if !repo.Fork {
+			repositories = append(repositories, repo)
+		}
+	}
+
 	return repositories, nil
 }
 

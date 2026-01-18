@@ -53,9 +53,26 @@ To see all languages instead of just the top 15:
 ./bin/gitlingo languages --all
 ```
 
+To exclude specific languages from the results (e.g., markup or configuration languages you're not interested in):
+
+```bash
+./bin/gitlingo languages --exclude CSS,HTML,Dart
+```
+
+You can combine the `--all` and `--exclude` flags:
+
+```bash
+./bin/gitlingo languages --all --exclude CSS,Python
+```
+
 ## How it works
 
 GitLingo fetches all your GitHub repositories and aggregates language statistics to show you what you code in most.
+
+**Note:** GitLingo analyzes:
+- Both **public and private** repositories (requires `repo` scope in your GitHub token)
+- Only repositories you **own** (excludes forked repositories)
+- Your actual **source code** (GitHub's language detection automatically excludes dependencies like `node_modules`, `vendor`, etc.)
 
 ## License
 

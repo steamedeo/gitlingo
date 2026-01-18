@@ -22,6 +22,11 @@ func NewLanguageCommand() *cli.Command {
 				Usage:    "show all languages instead of top 10",
 				Required: false,
 			},
+			&cli.StringFlag{
+				Name:     "exclude",
+				Usage:    "comma-separated list of languages to exclude (e.g., --exclude CSS,Python,Dart)",
+				Required: false,
+			},
 		},
 		Action: showLanguages,
 	}
@@ -29,6 +34,22 @@ func NewLanguageCommand() *cli.Command {
 
 func showLanguages(ctx context.Context, cmd *cli.Command) error {
 	showAll := cmd.Bool("all")
+	excludeStr := cmd.String("exclude")
+
+	// Parse excluded languages
+	var excludedLanguages map[string]bool
+	if excludeStr != "" {
+		excludedLanguages = make(map[string]bool)
+		parts := strings.Split(excludeStr, ",")
+		for _, lang := range parts {
+			trimmed := strings.TrimSpace(lang)
+			if trimmed != "" {
+				// Case-insensitive matching
+				excludedLanguages[strings.ToLower(trimmed)] = true
+			}
+		}
+	}
+
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 	s.Suffix = " Fetching GitHub data..."
 	s.Color("magenta", "bold")
@@ -39,6 +60,21 @@ func showLanguages(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 	s.Stop()
+
+	// Filter out excluded languages
+	if len(excludedLanguages) > 0 {
+		filteredStats := []github.Language{}
+		filteredTotal := 0
+		for _, lang := range stats.LanguageStats {
+			if !excludedLanguages[strings.ToLower(lang.Name)] {
+				filteredStats = append(filteredStats, lang)
+				filteredTotal += lang.Bytes
+			}
+		}
+		stats.LanguageStats = filteredStats
+		stats.TotalBytes = filteredTotal
+	}
+
 	fmt.Println() // Add spacing
 	renderStats(stats, showAll)
 	return nil
